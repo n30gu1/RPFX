@@ -22,24 +22,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debugPrint("updating Rich Presence status")
 
         var rp = RichPresence()
-        let fn = getActiveFilename()
         let ws = getActiveWorkspace()
+        let fn = getActiveFilename(ws)
+        
+        // determine workspace type
+        if let workspace = ws, workspace != xcodeUntitledWorkspace {
+            rp.state = "in \(withoutFileExt(workspace))"
+        }
 
         // determine file type
         if let fileName = fn {
             rp.details = "Editing \(fileName)"
-
             // do we recognise this file type?
             if let fileExt = getFileExt(fileName), discordRPImageKeys.contains(fileExt) {
                 rp.assets.largeImage = fileExt
             } else {
                 rp.assets.largeImage = discordRPImageKeyDefault
             }
-        }
-
-        // determine workspace type
-        if let workspace = ws, workspace != xcodeUntitledWorkspace {
-            rp.state = "in \(withoutFileExt(workspace))"
         }
 
         // Xcode was just launched?

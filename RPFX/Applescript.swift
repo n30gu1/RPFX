@@ -49,7 +49,7 @@ func runAPScript(_ s: APScripts) -> [String]? {
     return nil
 }
 
-func getActiveFilename() -> String? {
+func getActiveFilename(_ ws: String?) -> String? {
     guard let fileNames = runAPScript(.documentNames) else {
         return nil
     }
@@ -59,7 +59,14 @@ func getActiveFilename() -> String? {
     }
 
     // find the first window title that matches a filename
-    for window in windowNames { // iterate in order: the first window name is the one in focus
+    for windowName in windowNames { // iterate in order: the first window name is the one in focus
+        var window = windowName
+        if let workspace = ws {
+            if window.hasPrefix("\(withoutFileExt(workspace)) — ") {
+                window.removeSubrange(...window.firstIndex(of: "—")!)
+                window.removeFirst()
+            }
+        }
         // check the focused window refers to a file
         if fileNames.contains(window) {
             return window
